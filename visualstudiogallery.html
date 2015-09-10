@@ -1,0 +1,162 @@
+<p>This Visual Studio extension edits csproj files directry.</p>
+<p>Now it has 3 functions.</p>
+<ul>
+<li>Add SolutionDir</li>
+<li>Convert HintPath</li>
+<li>Add Config Transform</li>
+</ul>
+<p><img id="179041" src="https://i1.visualstudiogallery.msdn.s-msft.com/13af34ed-283c-4d8f-a134-fe0039b0d926/image/file/179041/1/%e3%82%ad%e3%83%a3%e3%83%97%e3%83%81%e3%83%a3111.png" alt="" width="649" height="430" /></p>
+<h2>Add SolutionDir&nbsp;</h2>
+<p>The csproj file created by Visual Studio 2013, SolutionDir is defined in csproj as below.</p>
+<p>
+<div class="scriptcode">
+<div class="pluginEditHolder" pluginCommand="mceScriptCode">
+<div class="title"><span>XML</span></div>
+<div class="pluginLinkHolder"><span class="pluginEditHolderLink">スクリプトの編集</span>|<span class="pluginRemoveHolderLink">Remove</span></div>
+<span class="hidden">xml</span>
+<pre class="hidden">  &lt;PropertyGroup&gt;
+    &lt;SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"&gt;..\&lt;/SolutionDir&gt;
+  &lt;/PropertyGroup&gt;</pre>
+<div class="preview">
+<pre class="xml">&nbsp;&nbsp;<span class="xml__tag_start">&lt;PropertyGroup</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;SolutionDir</span>&nbsp;<span class="xml__attr_name">Condition</span>=<span class="xml__attr_value">"$(SolutionDir)&nbsp;==&nbsp;''&nbsp;Or&nbsp;$(SolutionDir)&nbsp;==&nbsp;'*Undefined*'"</span><span class="xml__tag_start">&gt;.</span>.\<span class="xml__tag_end">&lt;/SolutionDir&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_end">&lt;/PropertyGroup&gt;</span></pre>
+</div>
+</div>
+</div>
+<div class="endscriptcode">&nbsp;But Visual Studio 2015 doesn't define SolutionDir in csproj. "Add SolutionDir" command inserts the abobe SolutionDir definition into cproj file in selected project.</div>
+<div class="endscriptcode"></div>
+<h2 class="endscriptcode">Convert HintPath</h2>
+<div class="endscriptcode">When a project refers the nuget library or other projects, HintPath is added to csproj file as below.</div>
+<div class="endscriptcode"></div>
+<div class="endscriptcode">
+<div class="scriptcode">
+<div class="pluginEditHolder" pluginCommand="mceScriptCode">
+<div class="title"><span>XML</span></div>
+<div class="pluginLinkHolder"><span class="pluginEditHolderLink">スクリプトの編集</span>|<span class="pluginRemoveHolderLink">Remove</span></div>
+<span class="hidden">xml</span>
+<pre class="hidden">    &lt;Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"&gt;
+      &lt;HintPath&gt;..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll&lt;/HintPath&gt;
+      &lt;Private&gt;True&lt;/Private&gt;
+    &lt;/Reference&gt;</pre>
+<div class="preview">
+<pre class="xml">&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Reference</span>&nbsp;<span class="xml__attr_name">Include</span>=<span class="xml__attr_value">"System.Reactive.Core,&nbsp;Version=2.2.5.0,&nbsp;Culture=neutral,&nbsp;PublicKeyToken=31bf3856ad364e35,&nbsp;processorArchitecture=MSIL"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;HintPath</span><span class="xml__tag_start">&gt;.</span>.\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll<span class="xml__tag_end">&lt;/HintPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Private</span><span class="xml__tag_start">&gt;</span>True<span class="xml__tag_end">&lt;/Private&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Reference&gt;</span></pre>
+</div>
+</div>
+</div>
+<div class="endscriptcode">The value is a file path with relative path. "Convert HintPath" command converts this relative path to the path with SolutionDir.</div>
+<div class="endscriptcode"></div>
+<div class="endscriptcode">
+<div class="scriptcode">
+<div class="pluginEditHolder" pluginCommand="mceScriptCode">
+<div class="title"><span>XML</span></div>
+<div class="pluginLinkHolder"><span class="pluginEditHolderLink">スクリプトの編集</span>|<span class="pluginRemoveHolderLink">Remove</span></div>
+<span class="hidden">xml</span>
+<pre class="hidden">    &lt;Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"&gt;
+      &lt;HintPath&gt;$(SolutionDir)packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll&lt;/HintPath&gt;
+      &lt;Private&gt;True&lt;/Private&gt;
+    &lt;/Reference&gt;</pre>
+<div class="preview">
+<pre class="xml">&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Reference</span>&nbsp;<span class="xml__attr_name">Include</span>=<span class="xml__attr_value">"System.Reactive.Core,&nbsp;Version=2.2.5.0,&nbsp;Culture=neutral,&nbsp;PublicKeyToken=31bf3856ad364e35,&nbsp;processorArchitecture=MSIL"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;HintPath</span><span class="xml__tag_start">&gt;$</span>(SolutionDir)packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll<span class="xml__tag_end">&lt;/HintPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Private</span><span class="xml__tag_start">&gt;</span>True<span class="xml__tag_end">&lt;/Private&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Reference&gt;</span></pre>
+</div>
+</div>
+</div>
+<div class="endscriptcode">&nbsp;</div>
+</div>
+</div>
+</p>
+<h2>Add Config Transform without Build Configuration but with BuildTarget option</h2>
+<p>Console project has no way to config transform like ASP.NET Web project. After executing "Add Config Transform" command, below lines are inserted into csproj.</p>
+<p>
+<div class="scriptcode">
+<div class="pluginEditHolder" pluginCommand="mceScriptCode">
+<div class="title"><span>XML</span></div>
+<div class="pluginLinkHolder"><span class="pluginEditHolderLink">スクリプトの編集</span>|<span class="pluginRemoveHolderLink">Remove</span></div>
+<span class="hidden">xml</span>
+<pre class="hidden">  &lt;UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" /&gt;
+  &lt;Target Name="AfterCompile" Condition="Exists('app.$(Configuration).config') And '$(BuildTarget)'==''"&gt;
+    &lt;!--Generate transformed app config in the intermediate directory--&gt;
+    &lt;TransformXml Source="app.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="app.$(Configuration).config" /&gt;
+    &lt;!--Force build process to use the transformed configuration file from now on.--&gt;
+    &lt;ItemGroup&gt;
+      &lt;AppConfigWithTargetPath Remove="app.config" /&gt;
+      &lt;AppConfigWithTargetPath Include="$(IntermediateOutputPath)$(TargetFileName).config"&gt;
+        &lt;TargetPath&gt;$(TargetFileName).config&lt;/TargetPath&gt;
+      &lt;/AppConfigWithTargetPath&gt;
+    &lt;/ItemGroup&gt;
+  &lt;/Target&gt;
+  &lt;!--Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one.--&gt;
+  &lt;Target Name="AfterPublish"&gt;
+    &lt;PropertyGroup&gt;
+      &lt;DeployedConfig&gt;$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)&lt;/DeployedConfig&gt;
+    &lt;/PropertyGroup&gt;
+    &lt;!--Publish copies the untransformed App.config to deployment directory so overwrite it--&gt;
+    &lt;Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" /&gt;
+  &lt;/Target&gt;
+  &lt;Target Name="AfterCompile" Condition="Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"&gt;
+    &lt;!--Generate transformed app config in the intermediate directory--&gt;
+    &lt;TransformXml Source="app.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="app.$(BuildTarget).config" /&gt;
+    &lt;!--Force build process to use the transformed configuration file from now on.--&gt;
+    &lt;ItemGroup&gt;
+      &lt;AppConfigWithTargetPath Remove="app.config" /&gt;
+      &lt;AppConfigWithTargetPath Include="$(IntermediateOutputPath)$(TargetFileName).config"&gt;
+        &lt;TargetPath&gt;$(TargetFileName).config&lt;/TargetPath&gt;
+      &lt;/AppConfigWithTargetPath&gt;
+    &lt;/ItemGroup&gt;
+  &lt;/Target&gt;
+  &lt;Target Name="AfterBuild" Condition="Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"&gt;
+    &lt;Delete Files="$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config" /&gt;
+    &lt;Copy SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(OutDir)$(TargetFileName).config" /&gt;
+    &lt;Copy SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config" /&gt;
+  &lt;/Target&gt;</pre>
+<div class="preview">
+<pre class="xml">&nbsp;&nbsp;<span class="xml__tag_start">&lt;UsingTask</span>&nbsp;<span class="xml__attr_name">TaskName</span>=<span class="xml__attr_value">"TransformXml"</span>&nbsp;<span class="xml__attr_name">AssemblyFile</span>=<span class="xml__attr_value">"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_start">&lt;Target</span>&nbsp;<span class="xml__attr_name">Name</span>=<span class="xml__attr_value">"AfterCompile"</span>&nbsp;<span class="xml__attr_name">Condition</span>=<span class="xml__attr_value">"Exists('app.$(Configuration).config')&nbsp;And&nbsp;'$(BuildTarget)'==''"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__comment">&lt;!--Generate&nbsp;transformed&nbsp;app&nbsp;config&nbsp;in&nbsp;the&nbsp;intermediate&nbsp;directory--&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;TransformXml</span>&nbsp;<span class="xml__attr_name">Source</span>=<span class="xml__attr_value">"app.config"</span>&nbsp;<span class="xml__attr_name">Destination</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span>&nbsp;<span class="xml__attr_name">Transform</span>=<span class="xml__attr_value">"app.$(Configuration).config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__comment">&lt;!--Force&nbsp;build&nbsp;process&nbsp;to&nbsp;use&nbsp;the&nbsp;transformed&nbsp;configuration&nbsp;file&nbsp;from&nbsp;now&nbsp;on.--&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;ItemGroup</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;AppConfigWithTargetPath</span>&nbsp;<span class="xml__attr_name">Remove</span>=<span class="xml__attr_value">"app.config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;AppConfigWithTargetPath</span>&nbsp;<span class="xml__attr_name">Include</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;TargetPath</span><span class="xml__tag_start">&gt;$</span>(TargetFileName).config<span class="xml__tag_end">&lt;/TargetPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/AppConfigWithTargetPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/ItemGroup&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Target&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__comment">&lt;!--Override&nbsp;After&nbsp;Publish&nbsp;to&nbsp;support&nbsp;ClickOnce&nbsp;AfterPublish.&nbsp;Target&nbsp;replaces&nbsp;the&nbsp;untransformed&nbsp;config&nbsp;file&nbsp;copied&nbsp;to&nbsp;the&nbsp;deployment&nbsp;directory&nbsp;with&nbsp;the&nbsp;transformed&nbsp;one.--&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_start">&lt;Target</span>&nbsp;<span class="xml__attr_name">Name</span>=<span class="xml__attr_value">"AfterPublish"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;PropertyGroup</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;DeployedConfig</span><span class="xml__tag_start">&gt;$</span>(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)<span class="xml__tag_end">&lt;/DeployedConfig&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/PropertyGroup&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__comment">&lt;!--Publish&nbsp;copies&nbsp;the&nbsp;untransformed&nbsp;App.config&nbsp;to&nbsp;deployment&nbsp;directory&nbsp;so&nbsp;overwrite&nbsp;it--&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Copy</span>&nbsp;<span class="xml__attr_name">Condition</span>=<span class="xml__attr_value">"Exists('$(DeployedConfig)')"</span>&nbsp;<span class="xml__attr_name">SourceFiles</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span>&nbsp;<span class="xml__attr_name">DestinationFiles</span>=<span class="xml__attr_value">"$(DeployedConfig)"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Target&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_start">&lt;Target</span>&nbsp;<span class="xml__attr_name">Name</span>=<span class="xml__attr_value">"AfterCompile"</span>&nbsp;<span class="xml__attr_name">Condition</span>=<span class="xml__attr_value">"Exists('app.$(BuildTarget).config')&nbsp;And&nbsp;'$(BuildTarget)'!=''"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__comment">&lt;!--Generate&nbsp;transformed&nbsp;app&nbsp;config&nbsp;in&nbsp;the&nbsp;intermediate&nbsp;directory--&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;TransformXml</span>&nbsp;<span class="xml__attr_name">Source</span>=<span class="xml__attr_value">"app.config"</span>&nbsp;<span class="xml__attr_name">Destination</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span>&nbsp;<span class="xml__attr_name">Transform</span>=<span class="xml__attr_value">"app.$(BuildTarget).config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__comment">&lt;!--Force&nbsp;build&nbsp;process&nbsp;to&nbsp;use&nbsp;the&nbsp;transformed&nbsp;configuration&nbsp;file&nbsp;from&nbsp;now&nbsp;on.--&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;ItemGroup</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;AppConfigWithTargetPath</span>&nbsp;<span class="xml__attr_name">Remove</span>=<span class="xml__attr_value">"app.config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;AppConfigWithTargetPath</span>&nbsp;<span class="xml__attr_name">Include</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;TargetPath</span><span class="xml__tag_start">&gt;$</span>(TargetFileName).config<span class="xml__tag_end">&lt;/TargetPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/AppConfigWithTargetPath&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_end">&lt;/ItemGroup&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Target&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_start">&lt;Target</span>&nbsp;<span class="xml__attr_name">Name</span>=<span class="xml__attr_value">"AfterBuild"</span>&nbsp;<span class="xml__attr_name">Condition</span>=<span class="xml__attr_value">"Exists('app.$(BuildTarget).config')&nbsp;And&nbsp;'$(BuildTarget)'!=''"</span><span class="xml__tag_start">&gt;&nbsp;
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Delete</span>&nbsp;<span class="xml__attr_name">Files</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Copy</span>&nbsp;<span class="xml__attr_name">SourceFiles</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span>&nbsp;<span class="xml__attr_name">DestinationFiles</span>=<span class="xml__attr_value">"$(OutDir)$(TargetFileName).config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="xml__tag_start">&lt;Copy</span>&nbsp;<span class="xml__attr_name">SourceFiles</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(TargetFileName).config"</span>&nbsp;<span class="xml__attr_name">DestinationFiles</span>=<span class="xml__attr_value">"$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"</span>&nbsp;<span class="xml__tag_start">/&gt;</span>&nbsp;
+&nbsp;&nbsp;<span class="xml__tag_end">&lt;/Target&gt;</span></pre>
+</div>
+</div>
+</div>
+<div class="endscriptcode">&nbsp;Now you can add "App.&lt;BuildTarget&gt;.config" file and write config transform in this file. Then you can transform app.config with MSBuild with "BuildTarget=&lt;BuildTarget&gt;" option.</div>
+</p>
+<p>&nbsp;</p>
+<p>Please give me feedback or bug report through <a href="https://github.com/tanaka-takayoshi/CsprojUtil" target="_blank"> GitHub repository</a>.</p>
+<p>&nbsp;</p>

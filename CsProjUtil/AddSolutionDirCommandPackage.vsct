@@ -65,21 +65,21 @@
         <Parent guid="guidCsProjUtilCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>SolutionDir 追加</ButtonText>
+          <ButtonText>Add SolutionDir</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidCsProjUtilCmdSet" id="ConvertHintPathToSolutionDir" priority="0x0200" type="Button">
         <Parent guid="guidCsProjUtilCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
         <Strings>
-          <ButtonText>HintPath変換</ButtonText>
+          <ButtonText>Convert HintPath</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidCsProjUtilCmdSet" id="AddConfigTransform" priority="0x0300" type="Button">
         <Parent guid="guidCsProjUtilCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages2" id="bmpPic1" />
         <Strings>
-          <ButtonText>Config変換追加</ButtonText>
+          <ButtonText>Add Config Transform</ButtonText>
         </Strings>
       </Button>
     </Buttons>
