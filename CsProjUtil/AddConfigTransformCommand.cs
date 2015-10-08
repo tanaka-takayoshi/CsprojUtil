@@ -100,11 +100,10 @@ namespace CsProjUtil
     <Copy Condition=""Exists('$(DeployedConfig)')"" SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(DeployedConfig)"" />
   </Target>";
 
-        private static XElement insertElement = XElement.Parse(@"<dummy xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
-  <!-- ****************************************** -->
+        private static readonly string previousVersionXml = @"  <!-- ****************************************** -->
   <!-- Begin App.config Transform Settings        -->
-  <!-- VSなど、BuildTargetを渡さずビルドした時専用         -->  
-  <!-- ****************************************** -->  
+  <!-- VSなど、BuildTargetを渡さずビルドした時専用   -->
+  <!-- ****************************************** -->
   <UsingTask TaskName=""TransformXml"" AssemblyFile=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll"" />
   <Target Name=""AfterCompile"" Condition=""Exists('app.$(Configuration).config') And '$(BuildTarget)'==''"">
     <!--Generate transformed app config in the intermediate directory-->
@@ -128,7 +127,7 @@ namespace CsProjUtil
   <!-- ****************************************** -->
   <!-- Begin App.config Custom Transform Settings -->
   <!-- MSBuild で /p:BuildTarget=Xxx を渡した時専用 -->
-  <!-- ****************************************** -->  
+  <!-- ****************************************** -->
   <Target Name=""AfterCompile"" Condition=""Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"">
     <!--Generate transformed app config in the intermediate directory-->
     <TransformXml Source=""app.config"" Destination=""$(IntermediateOutputPath)$(TargetFileName).config"" Transform=""app.$(BuildTarget).config"" />
@@ -145,14 +144,74 @@ namespace CsProjUtil
   <!-- -sc.App.Config が .exe.config より新しいかも判定して MSBuild はコピーしてるので、両方差し替えるの雑だけど安定 -->
   <Target Name=""AfterBuild"" Condition=""Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"">
     <Delete Files=""$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"" />
-    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config""
-          DestinationFiles=""$(OutDir)$(TargetFileName).config"" />
-    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config""
-          DestinationFiles=""$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"" />    
+    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(OutDir)$(TargetFileName).config"" />
+    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"" />
   </Target>
   <!-- ****************************************** -->
   <!-- End App.config Custom Transform Settings   -->
   <!-- ****************************************** -->
+  <Target Name=""EnsureNuGetPackageBuildImports"" BeforeTargets=""PrepareForBuild"">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition=""!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')"" Text=""$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))"" />
+  </Target>";
+
+        private static XElement insertElement = XElement.Parse(@"<dummy xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+<!-- **Start CsProjUtil.tanaka_733.28c450ee-efef-4e74-882a-dd3d6a0b438f** -->
+  <!-- Begin App.config Transform Settings        -->
+  <!-- VSなど、BuildTargetを渡さずビルドした時専用  -->
+  <!-- ****************************************** -->
+  <UsingTask TaskName=""TransformXml"" AssemblyFile=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll"" />
+  <Target Name=""TransformAppConfigWithConfiguration"" AfterTargets=""Compile"" Condition=""Exists('App.$(Configuration).config') And '$(BuildTarget)'==''"">
+    <Message Text=""Transform Appconfig with Configuration using App.$(Configuration).config""/>
+    <!--Generate transformed app config in the intermediate directory-->
+    <TransformXml Source=""app.config"" Destination=""$(IntermediateOutputPath)$(TargetFileName).config"" Transform=""app.$(Configuration).config"" />
+    <!--Force build process to use the transformed configuration file from now on.-->
+    <ItemGroup>
+      <AppConfigWithTargetPath Remove=""app.config"" />
+      <AppConfigWithTargetPath Include=""$(IntermediateOutputPath)$(TargetFileName).config"">
+        <TargetPath>$(TargetFileName).config</TargetPath>
+      </AppConfigWithTargetPath>
+    </ItemGroup>
+  </Target>
+  <!--Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one.-->
+  <Target Name=""CopyAppConfigWithConfiguration"" AfterTargets=""Publish"">
+    <Message Text=""Copy Appconfig with Configuration""/>
+    <PropertyGroup>
+      <DeployedConfig>$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)</DeployedConfig>
+    </PropertyGroup>
+    <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
+    <Copy Condition=""Exists('$(DeployedConfig)')"" SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(DeployedConfig)"" />
+  </Target>
+  <!-- ****************************************** -->
+  <!-- Begin App.config Custom Transform Settings -->
+  <!-- MSBuild で /p:BuildTarget=Xxx を渡した時専用-->
+  <!-- ****************************************** -->
+  <Target Name=""TransformAppConfigWithBuildTarget"" AfterTargets=""Compile"" Condition=""Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"">
+    <Message Text=""Transform Appconfig with BuildTarget using App.$(BuildTarget).config""/>
+    <!--Generate transformed app config in the intermediate directory-->
+    <TransformXml Source=""app.config"" Destination=""$(IntermediateOutputPath)$(TargetFileName).config"" Transform=""app.$(BuildTarget).config"" />
+    <!--Force build process to use the transformed configuration file from now on.-->
+    <ItemGroup>
+      <AppConfigWithTargetPath Remove=""app.config"" />
+      <AppConfigWithTargetPath Include=""$(IntermediateOutputPath)$(TargetFileName).config"">
+        <TargetPath>$(TargetFileName).config</TargetPath>
+      </AppConfigWithTargetPath>
+    </ItemGroup>
+  </Target>
+  <!-- ここで↑で生成した $(IntermediateOutputPath) (つまりobj/$(Configuration)) にあるコピー元となる -sc.App.Config を差し替え-->
+  <!-- -sc.App.Config が元となって、bin/$(Configuration) の exe.config が差し変わる -->
+  <!-- -sc.App.Config が .exe.config より新しいかも判定して MSBuild はコピーしてるので、両方差し替えるの雑だけど安定 -->
+  <Target Name=""CopyAppConfigWithBuildTarget"" AfterTargets=""Build"" Condition=""Exists('app.$(BuildTarget).config') And '$(BuildTarget)'!=''"">
+    <Message Text=""Copy Appconfig with BuildTarget""/>
+    <Delete Files=""$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"" />
+    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(OutDir)$(TargetFileName).config"" />
+    <Copy SourceFiles=""$(IntermediateOutputPath)$(TargetFileName).config"" DestinationFiles=""$(IntermediateOutputPath)$(ProjectFileName)-sc.App.config"" />
+  </Target>
+  <!-- ****************************************** -->
+  <!-- End App.config Custom Transform Settings   -->
+  <!-- **End CsProjUtil.tanaka_733.28c450ee-efef-4e74-882a-dd3d6a0b438f ** -->
 </dummy>", LoadOptions.PreserveWhitespace);
 
         /// <summary>
@@ -168,6 +227,7 @@ namespace CsProjUtil
             
             var content = File.ReadAllText(file);
             var removed = content.Replace(replacedText, "");
+            removed = content.Replace(previousVersionXml, "");
 
             var root = XElement.Parse(removed);
             var nspace = root.Name.Namespace;

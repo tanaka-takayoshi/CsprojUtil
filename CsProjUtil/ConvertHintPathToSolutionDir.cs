@@ -94,7 +94,7 @@ namespace CsProjUtil
             var hintPaths = itemGroups.Elements(nspace + "Reference").Elements(nspace + "HintPath");
             foreach (var hintPath in hintPaths)
             {
-                hintPath.Value = Regex.Replace(hintPath.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                hintPath.Value = Regex.Replace(hintPath.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
             }
             //ProjectReferenceの置換
             var projectReferences = root.Elements(nspace + "ProjectReference");
@@ -102,7 +102,7 @@ namespace CsProjUtil
             {
                 var attribute = projectReference.Attribute("Include");
                 if (attribute != null)
-                    attribute.Value = Regex.Replace(attribute.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                    attribute.Value = Regex.Replace(attribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
             }
             //Target/Error の置換
             var errors = root.Elements(nspace + "Target").Elements(nspace + "Error");
@@ -110,11 +110,11 @@ namespace CsProjUtil
             {
                 var conditionAttribute = error.Attribute("Condition");
                 if (conditionAttribute != null)
-                    conditionAttribute.Value = Regex.Replace(conditionAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                    conditionAttribute.Value = Regex.Replace(conditionAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
 
                 var textAttribute = error.Attribute("Text");
                 if (textAttribute != null)
-                    textAttribute.Value = Regex.Replace(textAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                    textAttribute.Value = Regex.Replace(textAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
             }
             //Importの置換
             var imports = root.Elements(nspace + "Import");
@@ -122,11 +122,11 @@ namespace CsProjUtil
             {
                 var attribute = import.Attribute("Project");
                 if (attribute != null)
-                    attribute.Value = Regex.Replace(attribute.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                    attribute.Value = Regex.Replace(attribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
 
                 var conditionAttribute = import.Attribute("Condition");
                 if (conditionAttribute != null)
-                    conditionAttribute.Value = Regex.Replace(conditionAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)");
+                    conditionAttribute.Value = Regex.Replace(conditionAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
             }
             root.Save(file);
         }

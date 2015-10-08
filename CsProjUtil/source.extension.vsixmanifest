@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="CsProjUtil.tanaka_733.28c450ee-efef-4e74-882a-dd3d6a0b438f" Version="1.0.2" Language="en-US" Publisher="tanaka_733" />
+    <Identity Id="CsProjUtil.tanaka_733.28c450ee-efef-4e74-882a-dd3d6a0b438f" Version="1.0.4" Language="en-US" Publisher="tanaka_733" />
     <DisplayName>CsProjUtil</DisplayName>
     <Description xml:space="preserve">Visual Studio Extension for editing csproj file</Description>
     <Tags>csproj</Tags>
