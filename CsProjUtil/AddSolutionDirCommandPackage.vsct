@@ -72,7 +72,7 @@
         <Parent guid="guidCsProjUtilCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages1" id="bmpPic1" />
         <Strings>
-          <ButtonText>Convert HintPath</ButtonText>
+          <ButtonText>Enable Auto Convert HintPath</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidCsProjUtilCmdSet" id="AddConfigTransform" priority="0x0300" type="Button">

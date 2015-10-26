@@ -34,11 +34,11 @@ namespace CsProjUtil
             return projFilePath;
         }
 
-        public static T GetProperty<T>(Project project, string index) where T : class
+        public static T GetProperty<T>(this Project project, string index) where T : struct 
         {
             try
             {
-                var assemblyName = project.Properties.Item(index).Value as T;
+                var assemblyName = project.Properties.Item(index).Value as T? ?? default(T);
                 return assemblyName;
             }
             catch (Exception)
@@ -46,11 +46,11 @@ namespace CsProjUtil
                 try
                 {
                     var properties = project.ConfigurationManager?.ActiveConfiguration?.Properties;
-                    return properties?.Item(index).Value as T;
+                    return properties?.Item(index).Value as T? ?? default(T);
                 }
                 catch (Exception)
                 {
-                    return null;
+                    return default(T);
                 }
             }
         }

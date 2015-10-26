@@ -6,10 +6,14 @@
 
 using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -48,6 +52,10 @@ namespace CsProjUtil
             }
         }
 
+        private DTE2 dte;
+
+        internal DTE2 DTE => dte ?? (dte = ServiceProvider.GetService(typeof (DTE)) as DTE2);
+
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
@@ -60,14 +68,9 @@ namespace CsProjUtil
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+        private IServiceProvider ServiceProvider => package;
 
+        private static RDTEvents events;
         /// <summary>
         /// Initializes the singleton instance of the command.
         /// </summary>
@@ -75,6 +78,7 @@ namespace CsProjUtil
         public static void Initialize(Package package)
         {
             Instance = new ConvertHintPathToSolutionDir(package);
+            events = new RDTEvents();
         }
 
         /// <summary>
@@ -87,7 +91,28 @@ namespace CsProjUtil
         private void MenuItemCallback(object sender, EventArgs e)
         {
             var file = CsProjUtil.GetPathOfSelectedItem();
-            var root = XElement.Load(file);
+            UpdateProjectProperty(file);
+        }
+
+        private void UpdateProjectProperty(string fileName)
+        {
+            var root = XElement.Load(fileName);
+            var nspace = root.Name.Namespace;
+            var element = root.Element(nspace + "PropertyGroup").Elements(nspace + "AutoConvertHintPath").FirstOrDefault();
+            if (element == null)
+            {
+                root.Element(nspace + "PropertyGroup").Add(new XElement(nspace + "AutoConvertHintPath", true));
+            }
+            else
+            {
+                element.Value = true.ToString();
+            }
+            root.Save(fileName);
+        }
+
+        private static void UpdateCsProj(string fileName)
+        {
+            var root = XElement.Load(fileName);
             var nspace = root.Name.Namespace;
             //HintPath の置換
             var itemGroups = root.Elements(nspace + "ItemGroup");
@@ -128,7 +153,31 @@ namespace CsProjUtil
                 if (conditionAttribute != null)
                     conditionAttribute.Value = Regex.Replace(conditionAttribute.Value, @"(\.\.\\)+", "$(SolutionDir)\\");
             }
-            root.Save(file);
+            root.Save(fileName);
+        }
+
+        class RDTEvents : RunningDocumentTableEvents
+        {
+            protected override void OnAfterSave(AfterSaveEventArgs e)
+            {
+                if (Path.GetExtension(e.FileName) == ".csproj")
+                {
+                    var root = XElement.Load(e.FileName);
+                    var nspace = root.Name.Namespace;
+                    var element =
+                        root.Elements(nspace + "PropertyGroup")
+                            .Elements(nspace + "AutoConvertHintPath")
+                            .FirstOrDefault();
+
+                    bool flg;
+                    bool.TryParse(element?.Value, out flg);
+
+                    if (flg)
+                    {
+                        UpdateCsProj(e.FileName);
+                    }
+                }
+            }
         }
     }
 }

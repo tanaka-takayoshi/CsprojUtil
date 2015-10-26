@@ -10,11 +10,13 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace CsProjUtil
 {
@@ -35,10 +37,12 @@ namespace CsProjUtil
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
+    [ProvideObject(typeof(CsProjUtilPropertyPageProvider))]
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(AddSolutionDirCommandPackage.PackageGuidString)]
+    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class AddSolutionDirCommandPackage : Package
     {
@@ -59,19 +63,20 @@ namespace CsProjUtil
         }
 
         #region Package Members
-
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
         protected override void Initialize()
         {
-            AddSolutionDirCommand.Initialize(this);
+            Debug.WriteLine("Initialize");
             base.Initialize();
+            AddSolutionDirCommand.Initialize(this);
             ConvertHintPathToSolutionDir.Initialize(this);
             AddConfigTransformCommand.Initialize(this);
         }
-
         #endregion
+        
     }
+
 }
